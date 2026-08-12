@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"] · IIIF Event-Sourced Manifest Store</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header class="site-header">
+    <a asp-page="/Index" class="brand">IIIF Event-Sourced Manifest Store</a>
+    <nav>
+        <a asp-page="/Index">Open Manifest</a>
+        <a asp-page="/Manifests/Create" class="primary-link">Import Manifest</a>
+    </nav>
+</header>
+
+<main class="shell">
+    @if (TempData["StatusMessage"] is string message)
+    {
+        <div class="status-message">@message</div>
+    }
+
+    @RenderBody()
+</main>
+
+<footer>
+    Proof of concept: KurrentDB event streams + aggregate-on-read + IIIF Manifest Serializer for .NET.
+</footer>
+</body>
+</html>

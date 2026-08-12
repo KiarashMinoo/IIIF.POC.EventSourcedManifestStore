@@ -1,0 +1,163 @@
+@page
+@model IIIF.POC.EventSourcedManifestStore.Pages.Manifests.DetailsModel
+@{
+    ViewData["Title"] = Model.Manifest.Label;
+}
+
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">
+            @(Model.Manifest.IsHistorical ? "HISTORICAL RECONSTRUCTION" : "AGGREGATED CURRENT STATE")
+        </span>
+        <h1>@Model.Manifest.Label</h1>
+        <p class="wrap"><code>@Model.Manifest.ManifestId</code></p>
+    </div>
+
+    <div class="button-group">
+        <a asp-page="Timeline"
+           asp-route-manifestId="@Model.Manifest.ManifestId"
+           class="button">Event timeline</a>
+
+        @if (Model.Manifest.IsHistorical)
+        {
+            <a asp-page="Details"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               class="button secondary">Current state</a>
+        }
+        else if (!Model.Manifest.IsDeleted)
+        {
+            <a asp-page="Delete"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               class="button danger">Delete</a>
+        }
+    </div>
+</section>
+
+<section class="metadata-grid">
+    <article>
+        <span>Stream revision</span>
+        <strong>@Model.Manifest.Revision</strong>
+    </article>
+    <article>
+        <span>Events replayed</span>
+        <strong>@Model.Manifest.EventCount</strong>
+    </article>
+    <article>
+        <span>Canvases</span>
+        <strong>@Model.Manifest.CanvasCount</strong>
+    </article>
+    <article>
+        <span>Source version</span>
+        <strong>@Model.Manifest.SourceVersion</strong>
+    </article>
+    <article class="wide">
+        <span>KurrentDB stream</span>
+        <code>@Model.Manifest.StreamName</code>
+    </article>
+</section>
+
+@if (Model.Manifest.IsDeleted)
+{
+    <div class="deleted-banner">
+        This aggregate contains a <code>iiif.manifest.deleted.v1</code> tombstone.
+        Its event history is preserved.
+    </div>
+}
+
+@if (!Model.Manifest.IsHistorical && !Model.Manifest.IsDeleted)
+{
+    <section class="card">
+        <div class="section-heading">
+            <div>
+                <span class="eyebrow">COMMANDS</span>
+                <h2>Mutate the reconstructed SDK instance</h2>
+                <p>
+                    Each command changes the live Manifest, obtains an SDK ChangeSet for audit metadata,
+                    then appends one replayable domain event using the current stream revision as the
+                    optimistic-concurrency check.
+                </p>
+            </div>
+        </div>
+
+        <div class="mutation-grid">
+            <form method="post" asp-page-handler="Mutate" class="mutation-card">
+                <input type="hidden" name="expectedRevision" value="@Model.Manifest.Revision" />
+                <input type="hidden" name="mutation" value="@ManifestMutation.RenameManifest" />
+                <label asp-for="NewLabel">New label</label>
+                <input asp-for="NewLabel" placeholder="Optional — generated if empty" />
+                <button type="submit">Change label</button>
+            </form>
+
+            <form method="post" asp-page-handler="Mutate" class="mutation-card">
+                <input type="hidden" name="expectedRevision" value="@Model.Manifest.Revision" />
+                <input type="hidden" name="mutation" value="@ManifestMutation.ToggleRights" />
+                <h3>Rights</h3>
+                <p>Toggle CC BY ↔ CC BY-SA.</p>
+                <button type="submit">Change rights</button>
+            </form>
+
+            <form method="post" asp-page-handler="Mutate" class="mutation-card">
+                <input type="hidden" name="expectedRevision" value="@Model.Manifest.Revision" />
+                <input type="hidden" name="mutation" value="@ManifestMutation.IncreaseFirstCanvasHeight" />
+                <h3>Nested Canvas</h3>
+                <p>Increase the first Canvas height by 100 pixels.</p>
+                <button type="submit">Increase height</button>
+            </form>
+
+            <form method="post" asp-page-handler="Mutate" class="mutation-card">
+                <input type="hidden" name="expectedRevision" value="@Model.Manifest.Revision" />
+                <input type="hidden" name="mutation" value="@ManifestMutation.AddCanvas" />
+                <h3>Addition</h3>
+                <p>Append a Canvas using a stable Canvas URI.</p>
+                <button type="submit">Add Canvas</button>
+            </form>
+
+            <form method="post" asp-page-handler="Mutate" class="mutation-card">
+                <input type="hidden" name="expectedRevision" value="@Model.Manifest.Revision" />
+                <input type="hidden" name="mutation" value="@ManifestMutation.RemoveLastCanvas" />
+                <h3>Removal</h3>
+                <p>Append a CanvasRemoved event instead of losing the deletion in a partial Manifest.</p>
+                <button type="submit" class="danger">Remove last Canvas</button>
+            </form>
+        </div>
+    </section>
+}
+
+<section class="card">
+    <div class="section-heading">
+        <div>
+            <span class="eyebrow">VERSION-AWARE OUTPUT</span>
+            <h2>
+                @(Model.Manifest.IsHistorical
+                    ? $"State reconstructed through revision {Model.Manifest.Revision}"
+                    : "Current state reconstructed from the complete stream")
+            </h2>
+            <p>
+                The aggregate is rebuilt first. The SDK then serializes that object model
+                to the requested Presentation API version.
+            </p>
+        </div>
+
+        <div class="button-group">
+            <a asp-page-handler="Export"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               asp-route-revision="@Model.RequestedRevision"
+               asp-route-target="v3.0"
+               class="button secondary">Export 3.0</a>
+
+            <a asp-page-handler="Export"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               asp-route-revision="@Model.RequestedRevision"
+               asp-route-target="v2.1"
+               class="button secondary">Export 2.1</a>
+
+            <a asp-page-handler="Export"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               asp-route-revision="@Model.RequestedRevision"
+               asp-route-target="v2.0"
+               class="button secondary">Export 2.0</a>
+        </div>
+    </div>
+
+    <pre>@Model.Manifest.Presentation3Json</pre>
+</section>

@@ -1,0 +1,29 @@
+@page
+@model IIIF.POC.EventSourcedManifestStore.Pages.Manifests.CreateModel
+@{
+    ViewData["Title"] = "Import Manifest";
+}
+
+<section class="page-heading">
+    <div>
+        <span class="eyebrow">STREAM REVISION 0</span>
+        <h1>Import a IIIF Manifest</h1>
+        <p>
+            The input is validated, version-detected, normalized to Presentation 3,
+            and stored as <code>iiif.manifest.imported.v1</code>.
+        </p>
+    </div>
+</section>
+
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<form method="post" class="card editor-card">
+    <label asp-for="Input.Json"></label>
+    <textarea asp-for="Input.Json" spellcheck="false"></textarea>
+    <span asp-validation-for="Input.Json" class="field-error"></span>
+
+    <div class="form-actions">
+        <button type="submit">Create event stream</button>
+        <a asp-page="/Index" class="button secondary">Cancel</a>
+    </div>
+</form>

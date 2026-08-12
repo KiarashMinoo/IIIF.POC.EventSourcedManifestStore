@@ -1,0 +1,19 @@
+@page
+@model ErrorModel
+@{
+    ViewData["Title"] = "Error";
+}
+
+<section class="card narrow">
+    <span class="eyebrow">ERROR</span>
+    <h1>The request could not be completed</h1>
+    <p>Check the application log and KurrentDB connection.</p>
+
+    @if (Model.ShowRequestId)
+    {
+        <p>
+            <strong>Request ID:</strong>
+            <code>@Model.RequestId</code>
+        </p>
+    }
+</section>

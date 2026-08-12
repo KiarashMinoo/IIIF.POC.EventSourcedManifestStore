@@ -1,0 +1,65 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Open Manifest";
+}
+
+<section class="hero">
+    <span class="eyebrow">KURRENTDB + EVENT SOURCING</span>
+    <h1>Rebuild the Manifest from its history</h1>
+    <p>
+        There is no current-state Manifest table in this POC.
+        KurrentDB is the source of truth. Enter a IIIF Manifest id and the application
+        replays its stream into a live SDK Manifest aggregate.
+    </p>
+</section>
+
+<div asp-validation-summary="ModelOnly" class="validation-summary"></div>
+
+<section class="two-column landing-grid">
+    <form method="post" class="card">
+        <span class="eyebrow">AGGREGATE ON READ</span>
+        <h2>Open an existing Manifest</h2>
+
+        <label asp-for="Input.ManifestId"></label>
+        <input asp-for="Input.ManifestId"
+               placeholder="https://example.org/iiif/manifest/1" />
+        <span asp-validation-for="Input.ManifestId" class="field-error"></span>
+
+        <button type="submit">Replay event stream</button>
+    </form>
+
+    <article class="card">
+        <span class="eyebrow">FIRST EVENT</span>
+        <h2>Create a new stream</h2>
+        <p>
+            Import Presentation 2.x or 3.0 JSON. The SDK validates it and stores the
+            canonical Presentation 3 representation as the first event in a deterministic
+            Manifest stream.
+        </p>
+        <a asp-page="/Manifests/Create" class="button">Import Manifest</a>
+    </article>
+</section>
+
+<section class="card architecture">
+    <span class="eyebrow">READ MODEL</span>
+    <h2>No snapshot database required</h2>
+    <pre class="diagram">manifest stream
+  0  iiif.manifest.imported.v1
+  1  iiif.manifest.label-changed.v1
+  2  iiif.canvas.height-changed.v1
+  3  iiif.canvas.added.v1
+  4  iiif.canvas.removed.v1
+               │
+               ▼
+          replay events
+               │
+               ▼
+       ManifestAggregate
+               │
+               ▼
+IIIF Manifest Serializer for .NET
+        ┌──────┼──────┐
+        ▼      ▼      ▼
+       3.0    2.1    2.0</pre>
+</section>

@@ -1,0 +1,49 @@
+@page
+@model IIIF.POC.EventSourcedManifestStore.Pages.Manifests.DeleteModel
+@{
+    ViewData["Title"] = "Delete Manifest";
+}
+
+<section class="card narrow danger-zone">
+    <span class="eyebrow">TOMBSTONE EVENT</span>
+    <h1>Delete this Manifest?</h1>
+
+    <p>
+        Event sourcing does not erase the stream. This operation appends
+        <code>iiif.manifest.deleted.v1</code>. Historical revisions remain replayable.
+    </p>
+
+    <dl>
+        <dt>Label</dt>
+        <dd>@Model.Manifest.Label</dd>
+
+        <dt>IIIF id</dt>
+        <dd class="wrap"><code>@Model.Manifest.ManifestId</code></dd>
+
+        <dt>Current revision</dt>
+        <dd>@Model.Manifest.Revision</dd>
+    </dl>
+
+    @if (Model.Manifest.IsDeleted)
+    {
+        <div class="deleted-banner">This Manifest already has a deletion event.</div>
+
+        <a asp-page="Details"
+           asp-route-manifestId="@Model.Manifest.ManifestId"
+           class="button secondary">Back</a>
+    }
+    else
+    {
+        <form method="post">
+            <input type="hidden"
+                   name="expectedRevision"
+                   value="@Model.Manifest.Revision" />
+
+            <button type="submit" class="danger">Append deletion event</button>
+
+            <a asp-page="Details"
+               asp-route-manifestId="@Model.Manifest.ManifestId"
+               class="button secondary">Cancel</a>
+        </form>
+    }
+</section>

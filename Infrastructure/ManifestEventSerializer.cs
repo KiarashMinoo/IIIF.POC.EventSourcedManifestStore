@@ -141,9 +141,3 @@ public sealed class ManifestEventSerializer
             rawJson);
     }
 }
-
-public sealed record DeserializedManifestEvent(
-    string EventType,
-    IManifestDomainEvent Data,
-    SdkChangeSetAuditV1? Audit,
-    string RawJson);

@@ -86,11 +86,11 @@ public sealed class ManifestAggregate
                     Manifest!.Items
                         .OfType<Canvas>()
                         .SingleOrDefault(
-                            x => x.Id == canvasRemoved.CanvasId);
+                            x => x.Id == canvasRemoved.CanvasId)
+                    ?? throw new InvalidOperationException(
+                        $"Canvas '{canvasRemoved.CanvasId}' is missing while replaying the stream.");
 
-                if (canvas is not null)
-                    Manifest.RemoveItem(canvas);
-
+                Manifest.RemoveItem(canvas);
                 Manifest.AcceptChanges();
                 break;
             }

@@ -5,6 +5,7 @@ using IIIF.Manifests.Serializer.Validation;
 using IIIF.POC.EventSourcedManifestStore.Domain.Events;
 using IIIF.POC.EventSourcedManifestStore.Infrastructure;
 using IIIF.POC.EventSourcedManifestStore.Models;
+using KurrentDB.Client;
 using Newtonsoft.Json;
 
 namespace IIIF.POC.EventSourcedManifestStore.Services;
@@ -433,9 +434,7 @@ public sealed class ManifestApplicationService(
 
     private static bool IsConcurrencyException(
         Exception exception) =>
-        exception.GetType().Name.Contains(
-            "WrongExpectedVersion",
-            StringComparison.Ordinal);
+        exception is WrongExpectedVersionException;
 
     private static string PrettyPrint(
         string json)

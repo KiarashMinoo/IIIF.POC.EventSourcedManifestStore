@@ -113,8 +113,3 @@ public sealed class KurrentManifestEventStore(
             cancellationToken: cancellationToken);
     }
 }
-
-public sealed record LoadedManifestStream(
-    string StreamName,
-    ManifestAggregate Aggregate,
-    IReadOnlyList<ManifestTimelineEventView> Timeline);

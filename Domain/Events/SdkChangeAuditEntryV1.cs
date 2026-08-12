@@ -7,8 +7,3 @@ public sealed record SdkChangeAuditEntryV1(
     string? OriginalValueJson,
     string? CurrentValueJson,
     DateTimeOffset DetectedAtUtc);
-
-public sealed record SdkChangeSetAuditV1(
-    Guid ChangeSetId,
-    DateTimeOffset CreatedAtUtc,
-    IReadOnlyList<SdkChangeAuditEntryV1> Changes);

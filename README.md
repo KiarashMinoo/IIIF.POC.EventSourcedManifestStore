@@ -4,6 +4,8 @@ A proof-of-concept .NET 10 Razor Pages application that stores IIIF Manifest sta
 
 Each Manifest has one deterministic KurrentDB stream, derived from its IIIF URI as `iiif-manifest-{sha256(manifestId)}`. The first event on that stream is the validated, canonical Presentation 3.0 Manifest; later events are replayable domain changes — label and rights changes, Canvas additions and removals, Canvas height changes, and a tombstone delete. Every mutation also captures the IIIF Manifest Serializer for .NET SDK's `GetChangeSet()` result as audit information stored alongside its domain event.
 
+[![Architecture diagram](https://gitdiagram.com/diagram-badge.svg)](https://gitdiagram.com/kiarashminoo/IIIF.POC.EventSourcedManifestStore?utm_source=readme&utm_medium=badge)
+
 ## Repository contents
 
 - `IIIF.POC.EventSourcedManifestStore/` — the application described above.
